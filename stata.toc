@@ -1,0 +1,9 @@
+v 0.1
+d Materials by David A. Armstrong II and William Poirier
+d Western University
+d davearmstrong.ps@gmail.com
+d https://github.com/davidaarmstrong/viztest_stata
+
+d 'viztest': Identifies optimal confidence level for visual testing
+
+p viztest
