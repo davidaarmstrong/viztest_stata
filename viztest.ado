@@ -5,7 +5,7 @@
 * Requires the function matsort be installed with:
 *     net install matsort.pkg
 program viztest
-	syntax , [lev1(real .25) lev2(real .99) incr(real .01) a(real .05) easythresh(real .05) adjust(string) inc0 remc usemargins]
+	syntax , [lev1(real .25) lev2(real .99) incr(real .01) a(real .05) easythresh(real .05) adjust(string) inc0 remc usemargins saving(string)]
 	if "`adjust'" == "" {
 	  local adjust = "none"
 	}
@@ -265,32 +265,32 @@ program viztest
 	else{
 		di "No missed tests!"
 	}
-	frame create levels level pr_same easiness
-	frame change levels 
-	mata: st_addobs(rows(res))
-	mata: st_store(., "level", res[,1])
-	mata: st_store(., "pr_same", res[,2])
-	mata: st_store(., "easiness", res[,3])
-	local fname = "result-levels-$S_TIME-$S_DATE.dta"
-	save "`fname'", replace
-	frame change default
-	frame drop levels
-	if `nr' > 1 {	
-		frame create missed 
-		frame change missed
-		gen str25 bigger = ""
-		gen str25 smaller = ""
-		gen str25 pw_test = ""
-		gen str25 ci_test = ""
-		mata: st_addobs(rows(miss_tests))
-		mata: st_sstore(., "bigger", miss_tests[,1])
-		mata: st_sstore(., "smaller", miss_tests[,2])
-		mata: st_sstore(., "pw_test", miss_tests[,3])
-		mata: st_sstore(., "ci_test", miss_tests[,4])
-		local fname = "result-missed-$S_TIME-$S_DATE.dta"
-		save "`fname'", replace
-		frame change default
-		frame drop missed
+	if "`saving'" != "" {
+	  local resname = "`saving'_results.dta"
+	  local missname = "`saving'_miss.dta"
+  	frame create levels level pr_same easiness
+  	frame change levels 
+  	mata: st_addobs(rows(res))
+  	mata: st_store(., "level", res[,1])
+  	mata: st_store(., "pr_same", res[,2])
+  	mata: st_store(., "easiness", res[,3])
+  	save "`resname'", replace
+  	frame change default
+  	if `nr' > 1 {	
+  		frame create missed 
+  		frame change missed
+  		gen str25 bigger = ""
+  		gen str25 smaller = ""
+  		gen str25 pw_test = ""
+  		gen str25 ci_test = ""
+  		mata: st_addobs(rows(miss_tests))
+  		mata: st_sstore(., "bigger", miss_tests[,1])
+  		mata: st_sstore(., "smaller", miss_tests[,2])
+  		mata: st_sstore(., "pw_test", miss_tests[,3])
+  		mata: st_sstore(., "ci_test", miss_tests[,4])
+  		save "`missname'", replace
+  		frame change default
+  	}
 	}
 	
 end

@@ -43,6 +43,9 @@
 
 {synopt:{opt usemargins}}  The function operates on any function that produces {it: e(b)} and {it: e(V)}, but it also works on the output from margins.  If both an estimation routine that produces {it: e(b)} and {it: e(V)} and a margins output that produces {it: r(b)} and {it: r(V)} are present, specifying {it: usemargins} will use the margins result rather than the estimation result. 
 
+{synopt:{opt saving(str)}}  Stem of a file name for saving the results.  As many as two files will be created in the working directory.  {it: `saving'}_results has all the confidence levels in the grid search and the corresponding results.  These will also appear in a frame called "levels".  If any tests were missed, then a new frame called "missed" will be created and a new file called {it: `saving'}_miss will be created in the working directory with all the missed tests. 
+
+
 {synoptline}
 {p2colreset}{...}
 {p 4 6 2}
