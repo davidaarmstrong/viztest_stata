@@ -1,0 +1,27 @@
+d 'viztest': module for finding the optimal confidence for visual testing
+d
+d The viztest function is a post-estimation function that calculates 
+d all relevant pairwise tests between estimates (e.g., regression coefficients
+d or margins results) and then does a grid search for a confidence level 
+d such that insignificant tests have overlapping confidence intervals and 
+d significant tests have non-overlapping confidence intervals. The identified
+d confidence level could then be used in an effect of coefficient plot 
+d and the (non-)overlaps on the confidence will optimally represent the 
+d pairwise tests.  The solution may not be perfect.  When it is not, a list of
+d the tests that are not captured this way is returned. 
+d
+d KW: confidence intervals
+d KW: visual testing
+d KW: pairwise comparisons
+d
+d Requires: Stata version >= 16
+d
+d Distribution-Date: 20240104
+d
+d Author: Dave Armstrong and William Poirier, Western University, London, ON, Canada
+d Support: email davearmstrong.ps@gmail.com
+d
+f viztest.ado
+f viztest.sthlp
+f ../m/matsort.ado
+f ../m/matsort.hlp
