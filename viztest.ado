@@ -47,7 +47,7 @@ program viztest
 		mat tmp = e(b)'
 		mat tmpV = e(V)
 	}
-
+	capture mat drop smallV smallV2 smallb
 	mat bhat = tmp
 	mat V = tmpV
 	local ncb = rowsof(bhat)
