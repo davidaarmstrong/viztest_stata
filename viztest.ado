@@ -252,15 +252,20 @@ program viztest
 	mata: olmat = ("Overlapping" \ "Not overlapping")
 	mata: miss_tests = varnames[miss[,1],1], varnames[miss[,2],1], sigmat[miss[,3]:+1, 1], olmat[miss[,4]:+1, 1]
 	}
+	mata: cn_ress = (J(3,1,""), ("Conf. Level" \ "Pr(Same)" \ "Easiness"))
+	mata: rn_ress = (J(rows(res_s), 1, ""), range(1, rows(res_s), 1))
+	
 	di " "
 	di "Optimal Levels: "
 	di " "
-	mata: res_s
+	mata: _matrix_list(res_s, rn_ress, cn_ress)
 	di " "
 	di "Missed Tests (n=`nmt' of `np')"
 	di " "
 	if `nrm' > 1{
-	mata: miss_tests
+	mata: cn_miss = (J(4,1,""), ("Larger" \ "Smaller" \ "PW Test" \ "CI Test"))
+	mata: rn_miss = (J(rows(miss_tests), 1, ""), (range(1, rows(miss_tests), 1))
+	mata: _matrix_list(miss_tests, rn_miss, cn_miss)
 	}
 	else{
 		di "No missed tests!"
