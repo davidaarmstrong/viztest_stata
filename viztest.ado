@@ -50,7 +50,28 @@ program viztest
 
 	mat bhat = tmp
 	mat V = tmpV
-
+	local ncb = rowsof(bhat)
+	forv i = 1/`ncb' {
+		local ref = bhat[`i',1]
+		if `ref' != 0 {
+		mat smallV = (nullmat(smallV) \ V[`i', ....])
+		}
+	} 
+	forv i = 1/`ncb' {
+		local ref = bhat[`i',1]
+		if `ref' != 0 {
+		mat smallV2 = (nullmat(smallV2) , smallV[...., `i'])
+		}
+	} 
+	forv i = 1/`ncb' {
+		local ref = bhat[`i',1]
+		if `ref' != 0 {
+		mat smallb = (nullmat(smallb) \ bhat[`i',....])
+		}
+	} 
+	
+	mat bhat = smallb
+	mat V = smallV2
 	
 	local kv = rowsof(V)
 	local kv2 = `kv'
