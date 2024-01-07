@@ -72,7 +72,8 @@ program viztest
 	
 	mat bhat = smallb
 	mat V = smallV2
-	
+	capture mat drop smallV smallV2 smallb
+
 	local kv = rowsof(V)
 	local kv2 = `kv'
 	local k = rowsof(bhat)
