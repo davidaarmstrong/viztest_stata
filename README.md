@@ -1,7 +1,5 @@
 Here, we detail some of the uses of the `viztest` package in Stata.  This package helps you find the optimal confidence level for visual testing and is based on our paper.  You can install the package as follows:
 
-
-
 ```stata
 net install viztest, from("https://raw.githubusercontent.com/davidaarmstrong/viztest_stata/main/")
 ```
@@ -79,23 +77,19 @@ viztest, lev1(.25) lev2(.99) incr(.01) a(.05) inc0 remc
 Optimal Levels: 
  
      Conf. Level     Pr(Same)     Easiness
-r51          .75    .88888889    6.8819594
-r52          .76    .88888889    6.9135418
-r53          .77    .88888889     6.946074
-r54          .78    .88888889    7.0065985
-r66           .9    .88888889    7.1567234
+r51          .75    .94444444    6.0563857
+r52          .76    .94444444    6.0642586
+r53          .77    .94444444    6.0723682
+r54          .78    .94444444    6.0942156
  
-Missed Tests (n=5 of 45)
+Missed Tests (n=2 of 36)
  
                      1                 2                 3                 4
     +-------------------------------------------------------------------------+
   1 |           LARGER           SMALLER           PW TEST           CI TEST  |
   2 |           ------           -------           -------           -------  |
-  3 |            lowht            lowptl       Significant       Overlapping  |
-  4 |         lowsmoke            lowage       Significant       Overlapping  |
-  5 |         low3race            lowage       Significant       Overlapping  |
-  6 |            lowui            lowage       Significant       Overlapping  |
-  7 |        low1brace              zero     Insignificant   Not overlapping  |
+  3 |            lowui              zero     Insignificant   Not overlapping  |
+  4 |           lowptl              zero     Insignificant   Not overlapping  |
     +-------------------------------------------------------------------------+
 ```
 
@@ -103,7 +97,7 @@ The result would suggest that if we wanted to make a coefficient plot, we should
 
 
 ```stata
-coefplot, level(90) drop(_cons) 
+coefplot, level(78) drop(_cons) 
 ```
 
 <img src="st_coef1.png" width="75%" style="display: block; margin: auto;" />
@@ -121,20 +115,18 @@ viztest, lev1(.25) lev2(.99) incr(.01) a(.05) inc0 remc usemargins
 Optimal Levels: 
  
      Conf. Level     Pr(Same)     Easiness
-r51          .75    .93333333    1.3533835
-r52          .76    .93333333    1.3620144
-r53          .77    .93333333    1.3685441
-r54          .78    .93333333    1.3752807
+r51          .75    .97222222    1.1400705
+r52          .76    .97222222    1.1441103
+r53          .77    .97222222    1.1459109
+r54          .78    .97222222    1.1477684
  
-Missed Tests (n=3 of 45)
+Missed Tests (n=1 of 36)
  
                      1                 2                 3                 4
     +-------------------------------------------------------------------------+
   1 |           LARGER           SMALLER           PW TEST           CI TEST  |
   2 |           ------           -------           -------           -------  |
-  3 |              ptl            1brace     Insignificant   Not overlapping  |
-  4 |              ptl              zero     Insignificant   Not overlapping  |
-  5 |           1brace              zero     Insignificant   Not overlapping  |
+  3 |              ptl              zero     Insignificant   Not overlapping  |
     +-------------------------------------------------------------------------+
 ```
 
@@ -142,7 +134,7 @@ Missed Tests (n=3 of 45)
 
 ```stata
 margins, dydx(*)
-marginsplot, level(78) recast(scatter) flip
+marginsplot, level(78) recast(scatter) 
 ```
 
 <img src="st_margins1.png" width="75%" style="display: block; margin: auto;" />
