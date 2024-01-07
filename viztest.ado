@@ -263,9 +263,8 @@ program viztest
 	di "Missed Tests (n=`nmt' of `np')"
 	di " "
 	if `nrm' > 1{
-	mata: cn_miss = (J(4,1,""), ("Larger" \ "Smaller" \ "PW Test" \ "CI Test"))
-	mata: rn_miss = st_matrixrowstripe("miss")
-	mata: _matrix_list(miss_tests, rn_miss, cn_miss)
+	mata: cn_miss = ("LARGER" , "SMALLER" , "PW TEST" , "CI TEST" \ "------", "-------", "-------", "-------")
+	mata: (cn_miss \ miss_tests)
 	}
 	else{
 		di "No missed tests!"
