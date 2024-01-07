@@ -3,8 +3,7 @@ Here, we detail some of the uses of the `viztest` package in Stata.  This packag
 
 
 ```stata
-net install viztest, 
-  from("https://raw.githubusercontent.com/davidaarmstrong/viztest_stata/main/")
+net install viztest, from("https://raw.githubusercontent.com/davidaarmstrong/viztest_stata/main/")
 ```
 
 

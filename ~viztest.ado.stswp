@@ -281,9 +281,6 @@ program viztest
 	di " "
 	mata: _matrix_list(res_s, rn_ress, cn_ress)
 	if `nrm' > 1{
-	di " "
-	di "Missed Tests (n=`nmt' of `np')"
-	di " "
 	mata: cn_miss = ("LARGER" , "SMALLER" , "PW TEST" , "CI TEST" \ "------", "-------", "-------", "-------")
 	mata: (cn_miss \ miss_tests)
 	}
