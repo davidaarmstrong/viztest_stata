@@ -1,13 +1,3 @@
----
-title: "'viztest' Stata Package Vignette"
-date: "2024-01-06"
-output:
-  html_document:
-    keep_md: yes
----
-
-
-
 Here, we detail some of the uses of the `viztest` package in Stata.  This package helps you find the optimal confidence level for visual testing and is based on our paper.  You can install the package as follows:
 
 
