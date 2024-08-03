@@ -47,7 +47,7 @@ program viztest
 		mat tmp = e(b)'
 		mat tmpV = e(V)
 	}
-
+	capture mat drop smallV smallV2 smallb
 	mat bhat = tmp
 	mat V = tmpV
 	local ncb = rowsof(bhat)
@@ -72,7 +72,11 @@ program viztest
 	
 	mat bhat = smallb
 	mat V = smallV2
-	
+	mat bhato = bhat
+	mat Vo = V
+
+	capture mat drop smallV smallV2 smallb
+
 	local kv = rowsof(V)
 	local kv2 = `kv'
 	local k = rowsof(bhat)
@@ -156,7 +160,6 @@ program viztest
 	local np = `k'*(`k'-1)/2
 	local resdf = _N-rowsof(tmp)
 	mat pairs = J(`np', 2, 0)
-
 	local cl = 1
 	matrix D = J(`k', `np', 0)
 	local upri = `k' -1
@@ -171,16 +174,106 @@ program viztest
 		}
 	}
 
+	if "`inc0'" != "" {
+		local w0 = .
+		local nbh = rowsof(bhat)
+		local rnbh : rownames(bhat)
+		tokenize `rnbh'
+		forval i = 1/`nbh' {
+			if("``i''" == "zero"){
+				local w0 = `i'
+			}
+		}
+		local lenb = rowsof(bhat)
+		** Use `w0' to remove zero values from D, pairs, bhat, V
+		if `w0' == 1 {
+			mat newBhat = bhat[2..., ]
+			mat newV = V[2..., 2...]
+			local newk = rowsof(newBhat)
+			local newnp = `newk'*(`newk'-1)/2
+			mat newpairs = J(`newnp', 2, 0)
+			local cl = 1
+			matrix newD = J(`newk', `newnp', 0)
+			local upri = `newk' -1
+			forval i = 1/`upri' {
+				local lwrj = `i' + 1
+				forval j = `lwrj'/`newk' {
+					matrix newD[`i', `cl'] = 1
+					matrix newD[`j', `cl'] = -1
+					mat newpairs[`cl', 1] = `i'
+					mat newpairs[`cl', 2] = `j'
+					local cl = `cl' + 1
+				}
+			}
 
-	mata: D = st_matrix("D")
-	mata: V = st_matrix("V")
-	mata: bhat = st_matrix("bhat")
-	mata: pairs = st_matrix("pairs")
+		}
+		if `w0' > 1 & `w0' < `lenb' {
+			mat nbtop = bhat[1..`=`w0'-1', ....]
+			mat nbbot = bhat[`=`w0'+1'..`lenb', ....]
+			mat newBhat = nbtop \ nbbot 
+			mat nVtop = V[1..`=`w0'-1', ....]
+			mat nVbot = V[`=`w0'+1'..`lenb', ....]
+			mat nVtopl = nVtop[...., 1..`=`w0'-1']
+			mat nVtopr = nVtop[...., `=`w0'+1'..`lenb']
+			mat nVbotl = nVbot[...., 1..`=`w0'-1']
+			mat nVbotr = nVbot[...., `=`w0'+1'..`lenb']
+			mat newV = nVtopl, nVtopr \ nVbotl, nVbotr
+			local newk = rowsof(newBhat)
+			local newnp = `newk'*(`newk'-1)/2
+			mat newpairs = J(`newnp', 2, 0)
+			local cl = 1
+			matrix newD = J(`newk', `newnp', 0)
+			local upri = `newk' -1
+			forval i = 1/`upri' {
+				local lwrj = `i' + 1
+				forval j = `lwrj'/`newk' {
+					matrix newD[`i', `cl'] = 1
+					matrix newD[`j', `cl'] = -1
+					mat newpairs[`cl', 1] = `i'
+					mat newpairs[`cl', 2] = `j'
+					local cl = `cl' + 1
+				}
+			}
+			
+		}
+		if `w0' == `lenb' {
+			mat newBhat = bhat[1..`=`lenb'-1', ]
+			mat newV = V[1..`=`lenb'-1', 1...`=`lenb'-1']
+			local newk = rowsof(newBhat)
+			local newnp = `newk'*(`newk'-1)/2
+			mat newpairs = J(`newnp', 2, 0)
+			local cl = 1
+			matrix newD = J(`newk', `newnp', 0)
+			local upri = `newk' -1
+			forval i = 1/`upri' {
+				local lwrj = `i' + 1
+				forval j = `lwrj'/`newk' {
+					matrix newD[`i', `cl'] = 1
+					matrix newD[`j', `cl'] = -1
+					mat newpairs[`cl', 1] = `i'
+					mat newpairs[`cl', 2] = `j'
+					local cl = `cl' + 1
+				}
+			}
+		}
+	}else{
+		mat newD = D
+		mat newV = V
+		mat newBhat = bhat
+		mat newparis = paris
+
+	}
+	
+	
+	mata: newD = st_matrix("newD")
+	mata: newV = st_matrix("newV")
+	mata: newBhat = st_matrix("newBhat")
+	mata: newpairs = st_matrix("newpairs")
 
 
-
-	mata: diffs = (bhat'*D)'
-	mata: diffV = D'*V*D
+	local np = rowsof(newpairs)
+	mata: diffs = (newBhat'*newD)'
+	mata: diffV = newD'*newV*newD
 	mata: diffSE = sqrt(diagonal(diffV))
 	mata: pvals = ttail(`resdf', diffs:/diffSE)
 	mata: pvals = p_adjust(pvals, "`adjust'")
@@ -188,46 +281,55 @@ program viztest
 	mata: ones = J(`np', 1, 1)
 	mata: st_numscalar("nsig", pwtests'*ones)
 	local qtl = 1-(1-`lev1')/2
-	mata: LL = bhat[,1] - invt(`resdf', `qtl'):*sqrt(diagonal(V))[,1]
-	mata: UU = bhat[,1] + invt(`resdf', `qtl'):*sqrt(diagonal(V))[,1]
+	mata: LL = newBhat[,1] - invt(`resdf', `qtl'):*sqrt(diagonal(newV))[,1]
+	mata: UU = newBhat[,1] + invt(`resdf', `qtl'):*sqrt(diagonal(newV))[,1]
 	mata: levs = range(`lev1', `lev2', `incr')
 	mata: st_matrix("levs", levs)
 	local nlevs = rowsof(levs)
 	forval l = 2/`nlevs'  {
 		local qtl = 1-(1-levs[`l',1])/2
-		mata: LL = LL, bhat[,1] - invt(`resdf', `qtl'):*sqrt(diagonal(V))[,1]
-		mata: UU = UU, bhat[,1] + invt(`resdf', `qtl'):*sqrt(diagonal(V))[,1]
+		mata: LL = LL, newBhat[,1] - invt(`resdf', `qtl'):*sqrt(diagonal(newV))[,1]
+		mata: UU = UU, newBhat[,1] + invt(`resdf', `qtl'):*sqrt(diagonal(newV))[,1]
 		}
 	mata: maxU = colmax(UU)
 	mata: minL = colmin(LL)
-	mata: thresh = (maxU :- minL):*`easythresh'
-	mata: st_matrix("thresh", thresh)
-	mata: L = LL[pairs[,1], ]
-	mata: U = UU[pairs[,2], ]
+	mata: L = LL[newpairs[,1], ]
+	mata: U = UU[newpairs[,2], ]
 	mata: citests = L :>= U
 	mata: comptests = citests :== pwtests
 	mata: ones = J(`np', 1, 1)
-
-
-	mata: d = (L-U):*pwtests + (U-L):*(1:-pwtests)
-	mata: st_matrix("d", d)
-	local rd = rowsof(d)
-	local cold = colsof(d)
-	forv j = 1/`cold'{
-		local thrsh = thresh[1,`j']
-		forv i = 1/`rd' {
-			local dij = d[`i',`j']
-			if `dij' > `thrsh' {
-				mat d[`i',`j'] = `thrsh'
-			}
-			if `dij' < -`thrsh'{
-				mat d[`i',`j'] = -`thrsh'
+	mata: Lsig = select(L, pwtests)
+	mata: Linsig = select(L, 1:-pwtests)
+	mata: Usig = select(U, pwtests)
+	mata: Uinsig = select(U, 1:-pwtests)
+	
+	mata: dsig = Lsig - Usig
+	mata: dinsig = Uinsig - Linsig
+	mata: 
+	nrows = rows(dsig)
+	ncols = cols(dsig)
+	for (i = 1; i <= nrows; i++) {
+		for (j = 1; j <= ncols; j++) {
+			if (dsig[i,j] < 0) {
+				dsig[i,j] = .
 			}
 		}
 	}
-	mata: d = st_matrix("d")
-	mata: easy = colsum(d)'
-	mata: res = levs, (comptests'*ones):/`np', easy
+	nrows = rows(dinsig)
+	ncols = cols(dinsig)
+	for (i = 1; i <= nrows; i++) {
+		for (j = 1; j <= ncols; j++) {
+			if (dinsig[i,j] < 0) {
+				dinsig[i,j] = .
+			}
+		}
+	}
+	end
+	
+	mata: dsig = colmin(dsig)
+	mata: dinsig = colmin(dinsig)
+	mata: easy = dinsig:*dsig
+	mata: res = levs, (comptests'*ones):/`np', easy'
 	mata: st_matrix("res", res)
 	mata: cm = colmax(res)
 	mata: st_numscalar("cm", cm[1,2])
@@ -281,6 +383,9 @@ program viztest
 	di " "
 	mata: _matrix_list(res_s, rn_ress, cn_ress)
 	if `nrm' > 1{
+	di " "
+	di "Missed Tests (n=`nmt' of `np')"
+	di " "
 	mata: cn_miss = ("LARGER" , "SMALLER" , "PW TEST" , "CI TEST" \ "------", "-------", "-------", "-------")
 	mata: (cn_miss \ miss_tests)
 	}
