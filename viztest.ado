@@ -265,7 +265,11 @@ program viztest
 
 	}
 	
-	
+	mata: D = st_matrix("D")
+	mata: V = st_matrix("V")
+	mata: bhat = st_matrix("bhat")
+	mata: pairs = st_matrix("pairs")
+
 	mata: newD = st_matrix("newD")
 	mata: newV = st_matrix("newV")
 	mata: newBhat = st_matrix("newBhat")
@@ -317,6 +321,34 @@ program viztest
 	mata: st_numscalar("cm", cm[1,2])
 	mata: st_numscalar("maxeasy", cm[1,3])
 
+	
+	local np = rowsof(pairs)
+	mata: diffs = (bhat'*D)'
+	mata: diffV = D'*V*D
+	mata: diffSE = sqrt(diagonal(diffV))
+	mata: pvals = ttail(`resdf', diffs:/diffSE)
+	mata: pvals = p_adjust(pvals, "`adjust'")
+	mata: pwtests = pvals :< `a'
+	mata: ones = J(`np', 1, 1)
+	mata: st_numscalar("nsig", pwtests'*ones)
+	local qtl = 1-(1-`lev1')/2
+	mata: LL = bhat[,1] - invt(`resdf', `qtl'):*sqrt(diagonal(V))[,1]
+	mata: UU = bhat[,1] + invt(`resdf', `qtl'):*sqrt(diagonal(V))[,1]
+	mata: levs = range(`lev1', `lev2', `incr')
+	mata: st_matrix("levs", levs)
+	local nlevs = rowsof(levs)
+	forval l = 2/`nlevs'  {
+		local qtl = 1-(1-levs[`l',1])/2
+		mata: LL = LL, bhat[,1] - invt(`resdf', `qtl'):*sqrt(diagonal(V))[,1]
+		mata: UU = UU, bhat[,1] + invt(`resdf', `qtl'):*sqrt(diagonal(V))[,1]
+		}
+	mata: maxU = colmax(UU)
+	mata: minL = colmin(LL)
+	mata: L = LL[pairs[,1], ]
+	mata: U = UU[pairs[,2], ]
+	mata: citests = L :>= U
+	mata: comptests = citests :== pwtests
+	
 	mat res_s = J(1,3,0)
 	local nlev = rowsof(res)
 	forval i = 1/`nlev' {
