@@ -305,27 +305,8 @@ program viztest
 	
 	mata: dsig = Lsig - Usig
 	mata: dinsig = Uinsig - Linsig
-	mata: 
-	nrows = rows(dsig)
-	ncols = cols(dsig)
-	for (i = 1; i <= nrows; i++) {
-		for (j = 1; j <= ncols; j++) {
-			if (dsig[i,j] < 0) {
-				dsig[i,j] = .
-			}
-		}
-	}
-	nrows = rows(dinsig)
-	ncols = cols(dinsig)
-	for (i = 1; i <= nrows; i++) {
-		for (j = 1; j <= ncols; j++) {
-			if (dinsig[i,j] < 0) {
-				dinsig[i,j] = .
-			}
-		}
-	}
-	end
-	
+	mata: dsig = replaceneg(dsig)
+	mata: dinsig = replaceneg(dinsig)
 	mata: dsig = colmin(dsig)
 	mata: dinsig = colmin(dinsig)
 	mata: easy = dinsig:*dsig
@@ -445,6 +426,20 @@ real matrix cummin(real matrix x) {
 	} 
 	return(out)
  }
+real matrix replaceneg(real matrix x) {
+	nrows = rows(x)
+	ncols = cols(x)
+	out = x
+	for (i = 1; i <= nrows; i++) {
+		for (j = 1; j <= ncols; j++) {
+			if (out[i,j] < 0) {
+				out[i,j] = .
+			}
+		}
+	}
+	return(out)
+}
+
  real matrix p_adjust(real matrix p, string scalar m){
 	methods = ("bonferroni", "holm", "hochberg", "hommel", "bh", "by", "none")
 	inmeth = rowsum( m :== methods)
