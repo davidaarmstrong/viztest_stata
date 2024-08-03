@@ -261,7 +261,7 @@ program viztest
 		mat newD = D
 		mat newV = V
 		mat newBhat = bhat
-		mat newparis = paris
+		mat newpairs = pairs
 
 	}
 	
