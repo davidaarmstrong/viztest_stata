@@ -256,7 +256,8 @@ program viztest
 				}
 			}
 		}
-	}else{
+	}
+	else{
 		mat newD = D
 		mat newV = V
 		mat newBhat = bhat
