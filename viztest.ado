@@ -158,7 +158,10 @@ program viztest
 	mat V = newV2
 	
 	local np = `k'*(`k'-1)/2
-	local resdf = _N-rowsof(tmp)
+	capture local resdf `r(df_r)'
+	if "`resdf'" == "" {
+		local resdf = _N-rowsof(tmp)
+	}
 	mat pairs = J(`np', 2, 0)
 	local cl = 1
 	matrix D = J(`k', `np', 0)
@@ -187,7 +190,7 @@ program viztest
 		local lenb = rowsof(bhat)
 		** Use `w0' to remove zero values from D, pairs, bhat, V
 		if `w0' == 1 {
-			mat newBhat = bhat[2..., ]
+			mat newBhat = bhat[2..., ....]
 			mat newV = V[2..., 2...]
 			local newk = rowsof(newBhat)
 			local newnp = `newk'*(`newk'-1)/2
@@ -237,8 +240,8 @@ program viztest
 			
 		}
 		if `w0' == `lenb' {
-			mat newBhat = bhat[1..`=`lenb'-1', ]
-			mat newV = V[1..`=`lenb'-1', 1...`=`lenb'-1']
+			mat newBhat = bhat[1..`=`lenb'-1', ....]
+			mat newV = V[1..`=`lenb'-1', 1..`=`lenb'-1']
 			local newk = rowsof(newBhat)
 			local newnp = `newk'*(`newk'-1)/2
 			mat newpairs = J(`newnp', 2, 0)
