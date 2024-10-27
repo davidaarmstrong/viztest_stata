@@ -47,6 +47,7 @@ program viztest
 		mat tmp = e(b)'
 		mat tmpV = e(V)
 	}
+	capture drop cm
 	capture mat drop smallV smallV2 smallb
 	mat bhat = tmp
 	mat V = tmpV
