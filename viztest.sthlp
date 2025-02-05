@@ -52,6 +52,14 @@
 {marker examples}{...}
 {title:{bf:Examples}}
 
+    {help viztest##regress_ex:Linear Regression Example}
+        {help viztest##regress_ex_me:Margins after Linear Regression Example}
+    {help viztest##logit_ex:Logistic Regression Example}
+        {help viztest##logit_coef:Plotting Logistic Regression Coefficients}
+        {help viztest##logit_coef:Plotting Logistic Regression Marginal Effects}
+    {help viztest##descriptive:Means by Survey Wave (from article Supplementary Material)}
+    {help viztest##logit_inter:Predicted Probabilities from Interactions in Logistic Regression (from article Supplementary Material)}
+
 {title:Setup}
 
 {pstd}
@@ -62,6 +70,7 @@
 
 {p}The viztest package interfaces with output from both modeling functions and margins.   The simplest way to use viztest is to estimate a model and then run the function.  Consider an example using the census13 data. We can use Andrew Gelman's idea of standardizing these variables by two standard deviations. For these examples and more formatted in a more aesthetically pleasing manner and with figures, see the {browse "https://github.com/davidaarmstrong/viztest_stata":GitHub Repository Readme Page}. 
 
+{marker regress_ex}{...}
 {title:Regression Example}
 
 {pstd}
@@ -166,7 +175,7 @@
 
 {p}In the output above, you can see now that the intervals for z_dr and z_pop do not overlap.   Some reviewers may complain that "These intervals are too narrow".  If we were using the intervals themselves to do the testing, that may be true.  However, we are doing the appropriate tests at the 95% level and are simply using 82% intervals to capture the relevant differences (or lack thereof) based on these 95% tests.  By decoupling the testing from the calculation of the confidence intervals, as long as their overlaps correspond with the test results (as they do in this case), they cannot be _too_ narrow because the goal of the intervals here is to allow pairwise testing of the coefficients, which is what they do.  
 
-
+{marker regress_ex_me}{...}
 {title:Viztest on the marginal effects}
 
 {p}In the output above, we are probably making some comparisons that are not meaningful.  Since median age (z_ma) is represented with a quadratic polynomial, we should probably not be testing each coefficient in the polynomial term agains everything else.  Instead, we should test something like the average marginal effect (i.e., the average first derivative of the term with respect to the outcome).  We can also do this by calculating the marginal effects with {cmd:margins} and then calling {cmd:viztest} with the argument {cmd:usemargins} on the result. 
@@ -213,6 +222,7 @@
 
 {phang2}{cmd:. marginsplot, level(82) recast(scatter)}
 
+{marker logit_ex}{...}
 {title:Logistic Regression Example}
 
 {pstd}
@@ -254,6 +264,7 @@
 
 {reset}
 
+{marker logit_coef}{...}
 {ul:Plotting Coefficients}
 
 {p}We could use {cmd:viztest} to find the optimal confidence level for visual comparison of the model parameters themselves. 
@@ -357,6 +368,7 @@ We can now place the matrix resutls as data in the new frame.
 
 {phang2}{cmd:. frame drop res}
 
+{marker logit_margins}
 {ul:Viztest on Margins result}
 
 {p}If you would rather use {cmd:viztest} on the first derivatives (continuous variables) or first differences (categorical variables specified with the i. construct), you could do this as well by calling the appropriate {cmd:margins} command and then proceeding in a similar fashion as above.  First, we could estimate {cmd:viztest} on the results of {cmd:margins}.  
@@ -478,6 +490,261 @@ We can now place the matrix resutls as data in the new frame.
 
 {phang2}{cmd:. frame drop res}
 
+{marker descriptive}{...}
+{title:Descriptive Statistics}
+
+{p}The first example from Armstrong and Poirier's supplementary material has to do with plotting means and confidence intervals over time.  We use data from Gibson (2024). 
+
+{phang2}{cmd:. use "https://github.com/davidaarmstrong/viztest_stata/raw/refs/heads/main/data/gibson_dat.dta", clear"}
+
+{p}In this case, we are using a regression to calculate the means and their confidence intervals.  
+
+{phang2}{cmd:. quietly reg agree1 i.WAVE [pw=WEIGHT]}
+
+{p}We use {cmd:margins} to calculate the mean in each wave of the survey from the regression analysis in the previous step. 
+
+{phang2}{cmd:. margins WAVE}
+
+{result}
+        
+        Adjusted predictions                                     Number of obs = 5,103
+        Model VCE: Robust
+        
+        Expression: Linear prediction, predict()
+        
+        --------------------------------------------------------------------------------
+                       |            Delta-method
+                       |     Margin   std. err.      t    P>|t|     [95% conf. interval]
+        ---------------+----------------------------------------------------------------
+                  WAVE |
+            July 2020  |   .1412726   .0152265     9.28   0.000     .1114222     .171123
+        December 2020  |   .0845361   .0114693     7.37   0.000     .0620515    .1070208
+           March 2021  |   .1125555   .0117481     9.58   0.000     .0895242    .1355869
+            July 2022  |   .1890228   .0153233    12.34   0.000     .1589825     .219063
+        --------------------------------------------------------------------------------
+{reset}
+
+{p}We can then use {cmd:viztest} to find the appropriate inferential confidence intervals. 
+
+{phang2}{cmd:. viztest, a(.025) usemargins incr(.001)}
+
+{p}In the command above, we use {cmd:a(.025)} to do a two-tailed test at the 0.05 level and {cmd:usemargins} to ensure we take the result from margins rather than the regression.  
+
+{result}
+        Optimal Levels: 
+         
+        Smallest Level: .773
+        Middle Level: .826
+        Largest Level: .881
+        Easiest Level: .834
+         
+        No missed tests!
+{reset}
+
+{p}Next, we estimate {cmd:margins} again to get the estimates and default 95% confidence intervals for plotting
+
+
+{phang2}{cmd:. quietly margins WAVE}
+
+{p} We then follow the same procedure outlined above to save the estimates and 95% confidence intervals, calculate the 84% intervals and save all those results in a new frame. 
+
+{phang2}{cmd:. mat tabo = r(table)'}
+
+{phang2}{cmd:. mat tabo = tabo[....,1], tabo[....,5], tabo[....,6]}
+
+{phang2}{cmd:. quietly margins WAVE, level(84)}
+
+{phang2}{cmd:. mat tabi = r(table)'}
+
+{phang2}{cmd:. mat tabi = tabi[....,5], tabi[....,6]}
+
+{phang2}{cmd:. mat out = tabo, tabi}
+
+{phang2}{cmd:. frame create res}
+
+{phang2}{cmd:. frame change res}
+
+{phang2}{cmd:. svmat out, names(out)}
+
+{phang2}{cmd:. rename out1 estimate}
+
+{phang2}{cmd:. rename out2 lwr95}
+
+{phang2}{cmd:. rename out3 upr95}
+
+{phang2}{cmd:. rename out4 lwr84}
+
+{phang2}{cmd:. rename out5 upr84}
+
+{p} We can then use those results to make a plot: 
+
+{phang2}{cmd:. gen obs = _n}
+
+{phang2}{cmd:. twoway  (rcapsym lwr95 upr95 obs, lwidth(medium) msymbol(none) lcolor(gs8)) || (rcapsym lwr84 upr84 obs, lwidth(vthick) msymbol(none) lcolor(black)) ||  (scatter estimate obs, mcolor(white) mfcolor(white) msymbol(circle)),  xlabel(1 "July 2020" 2 "December 2020" 3 "March 2021" 4 "July 2022") legend(order(2 "Inferential (84%)" 1 "Original (95%)") position(12) cols(2))  xtitle("Wave") ytitle("Proportion Agreeing")}
+
+{p} Finally, we can return to the default frame and drop the frame we created to hold these results. 
+
+{phang2}{cmd:. frame change default}
+
+{phang2}{cmd:. frame drop res}
+
+{marker logit_inter}{...}
+{title:Logistic Regression Model Interactions}
+
+{p} The second replication in the paper's supplementary materials uses data from Iyengar and Westwood (2015).  We can load the data as follows: 
+
+{phang2}{cmd:. use "https://github.com/davidaarmstrong/viztest_stata/raw/refs/heads/main/data/iw_dat.dta", clear"}
+
+{p} We can estimate the regression model with the interaction between participant party ID and the treatment variable identifying the qualifications of the 
+
+{phang2}{cmd:. quietly logit partisanSelection i.participantPID2##i.mostQualifiedPerson}
+
+{p} In this case, we have three different sets of estimates we care about - {cmd:mostQualifiedPerson == 1} (the two candidates are equally qualified), {cmd:mostQualifiedPerson == 2} (the republican is more qualified) and {cmd:mostQualifiedPerson == 3} (the democrat is more qualified).  We can estimate viztest on each of these sets differently.  Theoreatically, we could use different confidence levels for each group, though if a common inferential confidence level exists it might be best to use that one. 
+
+{phang2}{cmd:. quietly margins participantPID2, at(mostQualifiedPerson = 1)}
+
+{phang2}{cmd:. viztest, a(.025) lev1(.5) lev2(.95) incr(.001) usemargins}
+
+{result}
+        Optimal Levels: 
+         
+        Smallest Level: .581
+        Middle Level: .731
+        Largest Level: .883
+        Easiest Level: .765
+         
+        No missed tests!
+{reset}
+
+{phang2}{cmd:. quietly margins participantPID2, at(mostQualifiedPerson = 2)}
+
+{phang2}{cmd:. viztest, a(.025) lev1(.5) lev2(.95) incr(.001) usemargins}
+
+{result}
+        Optimal Levels: 
+         
+        Smallest Level: .818
+        Middle Level: .843
+        Largest Level: .87
+        Easiest Level: .845
+         
+        No missed tests!
+{reset}
+
+
+{phang2}{cmd:. quietly margins participantPID2, at(mostQualifiedPerson = 3)}
+
+{phang2}{cmd:. viztest, a(.025) lev1(.5) lev2(.95) incr(.001) usemargins}
+
+{result}
+        Optimal Levels: 
+         
+        Smallest Level: .5
+        Middle Level: .673
+        Largest Level: .848
+        Easiest Level: .678
+         
+        No missed tests!
+{reset}
+
+{p} The three different sets of inferential confidence levels are (.581, .883), (.818, .870) and (0.500, 0.848).  Any number in the interval (.818, .848) would work.  We use the 84% confidence level because it is one that has been suggested by previous research and it happens to work for all stimuli in this case. We can then make the estimates for all three groups at once. 
+
+{phang2}{cmd:. quietly margins participantPID2, at(mostQualifiedPerson = (1 2 3))}
+
+{p} We use the same procedure described above to save the estimates, default 95% confidence intervals as well as the 84% confidence intervals for plotting. 
+
+{phang2}{cmd:. mat tabo = r(table)'}
+
+{phang2}{cmd:. mat tabo = tabo[....,1], tabo[....,5], tabo[....,6]}
+
+{phang2}{cmd:. quietly margins participantPID2, at(mostQualifiedPerson = (1 2 3)) level(84)}
+
+{phang2}{cmd:. mat tabi = r(table)'}
+
+{phang2}{cmd:. mat tabi = tabi[....,5], tabi[....,6]}
+
+{phang2}{cmd:. mat out = tabo, tabi}
+
+{phang2}{cmd:. frame create res}
+
+{phang2}{cmd:. frame change res}
+
+{phang2}{cmd:. svmat out, names(out)}
+
+{phang2}{cmd:. rename out1 estimate}
+
+{phang2}{cmd:. rename out2 lwr95}
+
+{phang2}{cmd:. rename out3 upr95}
+
+{phang2}{cmd:. rename out4 lwr84}
+
+{phang2}{cmd:. rename out5 upr84}
+
+{p} Now we can make the graph. We make the variable {it:mqp} to correspond with the output from {cmd:margins}. 
+
+{phang2}{cmd:. gen mqp = .}
+
+{phang2}{cmd:. replace mqp = 1 in 1/5}
+
+{phang2}{cmd:. replace mqp = 2 in 6/10}
+
+{phang2}{cmd:. replace mqp = 3 in 11/15}
+
+{phang2}{cmd:. label def mqp 1 "Equally Qualified" 2 "R More Qualified" 3 "D More Qualified"}
+
+{phang2}{cmd:. label val mqp mqp}
+
+{p} We generate party id ({it:pid}) to correspond with the output from {cmd:margins} as well. 
+
+{phang2}{cmd:. gen pid = .}
+
+{p} For democrats:
+
+	{cmd:. foreach i of num 2 7 12 {c -(}}
+	{cmd:.   replace pid = 1 in `i'}
+	{cmd:. {c )-}}
+
+{p} For leaning democrats: 
+
+	{cmd:. foreach i of num 3 8 13 {c -(}}
+	{cmd:.   replace pid = 2 in `i'}
+	{cmd:. {c )-}}
+
+{p} For independents: 
+
+	{cmd:. foreach i of num 1 6 11 {c -(}}
+	{cmd:.   replace pid = 3 in `i'}
+	{cmd:. {c )-}}
+
+{p} For leaning republicans: 
+
+	{cmd:. foreach i of num 4 9* 14 {c -(}}
+	{cmd:.   replace pid = 4 in `i'}
+	{cmd:. {c )-}}
+
+{p} For republicans: 
+
+	{cmd:. foreach i of num 5 10 15 {c -(}}
+	{cmd:.   replace pid = 5 in `i'}
+	{cmd:. {c )-}}
+
+{p} Now we can define the labels for the {it:pid} variable.
+
+{phang2}{cmd:. label def pid 1 "D" 2 "LD" 3 "I" 4 "LR" 5 "R"}
+
+{phang2}{cmd:. label val pid pid}
+
+{p} Finally, we can make the graph
+
+{phang2}{cmd:. twoway (pcspike pid lwr95 pid upr95, lwidth(medium) lcolor(gs8)) ||  (pcspike pid lwr84 pid upr84, lwidth(vthick) lcolor(black)) ||  (scatter pid estimate, mcolor(white) mfcolor(white) msymbol(circle)),  by(mqp, cols(3) compact note(""))  legend(order(2 "Inferential (84%)" 1 "Original (95%)") position(12) cols(2))  xtitle("Predict Pr(Choose Republican)") ytitle("") ylabel(1 "D" 2 "LD" 3 "I" 4 "LR" 5 "R")}
+
+{p} Finally, we can change frames and delete our temorary frame. 
+
+{phang2}{cmd:. frame change default}
+
+{phang2}{cmd:. frame drop res}
+
 {reset}
 {marker author}{...}
 {title:Authors and support}
@@ -498,16 +765,22 @@ We can now place the matrix resutls as data in the new frame.
 
 {marker ap24}{...}
 {phang}
-Armstrong, David A., II and William Poirier.  Forthcoming.  Decoupling Visualization and Testing when Presenting Confidence Intervals.
-{it:Political Analysis} doi:10.1017/pan.2024.24
+Armstrong, David A., II and William Poirier.  Forthcoming.  Decoupling Visualization and Testing when Presenting Confidence Intervals. {it:Political Analysis} doi:10.1017/pan.2024.24
 
 {marker bretz10}{...}
 {phang}
 Bretz, Frank, Torsten Hothorn and Peter Westfall.  2010.  {it: Multiple Comparisons Using R}.  Boca Raton, FL: CRC Press.
 
+{marker gibson24}{...}
+{phang}
+Gibson, James.  2024.  Losing legitimacy: the challenges of the dobbs ruling to conventional legitimacy theory. {it:American Journal of Political Science.}
+
+{marker iyengar15}{...}
+{phang}
+Iyengar, S., and S. J. Westwood.  2015.  Fear and loathing across party lines: new evidence on group polarization. {it:American Journal of Political Science} 59 (3): 690–707.
+
 {marker payton03}{...}
 {phang}
-Payton, Mark E., Matthew H. Greenstone, and Nathaniel Schenker. 2003. Overlapping confidence intervals or standard
-error intervals: What do they mean in terms of statistical significance? {it:Journal of Insect Science} 3(1): 34.
+Payton, Mark E., Matthew H. Greenstone, and Nathaniel Schenker. 2003. Overlapping confidence intervals or standard error intervals: What do they mean in terms of statistical significance? {it:Journal of Insect Science} 3(1): 34.
 
 {p}
