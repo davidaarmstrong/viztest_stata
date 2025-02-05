@@ -58,7 +58,7 @@
 
 {p}You can install the package from github as follows: 
 
-{phang2}{cmd:. net install viztest, from("https://raw.githubusercontent.com/davidaarmstrong/viztest_stata/main/")}
+{phang2}{cmd:. net install viztest, from("https://raw.githubusercontent.com/davidaarmstrong/viztest_stata/main/") force}
 
 {p}The viztest package interfaces with output from both modeling functions and margins.   The simplest way to use viztest is to estimate a model and then run the function.  Consider an example using the census13 data. We can use Andrew Gelman's idea of standardizing these variables by two standard deviations. 
 
