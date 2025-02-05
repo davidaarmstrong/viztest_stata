@@ -60,7 +60,7 @@
 
 {phang2}{cmd:. net install viztest, from("https://raw.githubusercontent.com/davidaarmstrong/viztest_stata/main/") force}
 
-{p}The viztest package interfaces with output from both modeling functions and margins.   The simplest way to use viztest is to estimate a model and then run the function.  Consider an example using the census13 data. We can use Andrew Gelman's idea of standardizing these variables by two standard deviations. 
+{p}The viztest package interfaces with output from both modeling functions and margins.   The simplest way to use viztest is to estimate a model and then run the function.  Consider an example using the census13 data. We can use Andrew Gelman's idea of standardizing these variables by two standard deviations. For these examples and more formatted in a more aesthetically pleasing manner and with figures, see the {browse "https://github.com/davidaarmstrong/viztest_stata":GitHub Repository Readme Page}. 
 
 {title:Regression Example}
 
