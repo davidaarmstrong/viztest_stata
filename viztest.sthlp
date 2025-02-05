@@ -427,7 +427,7 @@
 
 {p}Make the graph.
 
-{phang}{cmd:. twoway  (rcapsym lwr95 upr95 obs, lwidth(medium) msymbol(none) lcolor(gs8)) ||(rcapsym lwr77 upr77 obs, lwidth(vthick) msymbol(none) lcolor(black)) || (scatter estimate obs, mcolor(white) mfcolor(white) msymbol(circle)), xlabel(1 "Age" 2 "Weight" 3 "Race: Black" 4 "Race: Other" 5 "Smoke During Pregnancy" 6 "Premature Labor History" 7 "Hyptertension History" 8 "Uterine Irritability", angle(45))legend(order(2 "Inferential (77%)" 1 "Original (95%)") position(12) cols(2))xtitle("Parameters") ytitle("Pr(Low Birth Weight)")}
+{phang}{cmd:. twoway rcapsym lwr95 upr95 obs, lwidth(medium) msymbol(none) lcolor(gs8)) || (rcapsym lwr77 upr77 obs, lwidth(vthick) msymbol(none) lcolor(black)) || (scatter estimate obs, mcolor(white) mfcolor(white) msymbol(circle)), xlabel(1 "Age" 2 "Weight" 3 "Race: Black" 4 "Race: Other" 5 "Smoke During Pregnancy" 6 "Premature Labor History" 7 "Hyptertension History" 8 "Uterine Irritability", angle(45)) legend(order(2 "Inferential (77%)" 1 "Original (95%)") position(12) cols(2)) xtitle("Parameters") ytitle("Pr(Low Birth Weight)")}
 
 {p}If you created a new frame, change back to the default frame and drop the temporary one we created. 
 
