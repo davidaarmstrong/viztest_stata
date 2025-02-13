@@ -4,7 +4,6 @@
 * Requires Stata >= 16 because frames are used to save results.
 * Requires the function matsort be installed with:
 *     net install matsort.pkg
-version 16.0
 program viztest, rclass
 	syntax , [lev1(real .25) lev2(real .99) incr(real .01) a(real .05) easythresh(real .05) adjust(string) inc0 remc usemargins saving(string)]
 	if "`adjust'" == "" {
@@ -453,8 +452,8 @@ program viztest, rclass
 	return scalar middle = `mlev'
 	return scalar biggest = `blev'
 	return scalar smallest = `slev'
-	return matrix grid = res
-	return matrix missed = miss_tests
+//	return matrix grid = res
+//	return matrix missed = miss_tests
 end
 
 mata
