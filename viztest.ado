@@ -4,8 +4,8 @@
 * Requires Stata >= 16 because frames are used to save results.
 * Requires the function matsort be installed with:
 *     net install matsort.pkg
-program viztest
-	syntax , [lev1(real .25) lev2(real .99) incr(real .01) a(real .05) adjust(string) inc0 remc usemargins saving(string)]
+program viztest, rclass
+	syntax , [lev1(real .25) lev2(real .99) incr(real .01) a(real .05) easythresh(real .05) adjust(string) inc0 remc usemargins saving(string)]
 	if "`adjust'" == "" {
 	  local adjust = "none"
 	}
