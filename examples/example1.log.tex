@@ -1,0 +1,61 @@
+. webuse census13, clear
+(1980 Census data by state)
+{\smallskip}
+. egen z_mr = std(mrgrate)
+{\smallskip}
+. egen z_dr = std(dvcrate)
+{\smallskip}
+. egen z_ma = std(medage)
+{\smallskip}
+. egen z_pop = std(pop)
+{\smallskip}
+. label var z_mr "Marriage Rate"
+{\smallskip}
+. label var z_ma "Median Age"
+{\smallskip}
+. label var z_dr "Divorce Rate"
+{\smallskip}
+. label var z_pop "Population"
+{\smallskip}
+. reg brate z_mr z_dr z_pop c.z_ma\#\#c.z_ma
+{\smallskip}
+      Source {\VBAR}       SS           df       MS      Number of obs   =        50
+\HLI{13}{\PLUS}\HLI{34}   F(5, 44)        =     75.80
+       Model {\VBAR}  37807.3612         5  7561.47224   Prob > F        =    0.0000
+    Residual {\VBAR}  4389.45878        44  99.7604268   R-squared       =    0.8960
+\HLI{13}{\PLUS}\HLI{34}   Adj R-squared   =    0.8842
+       Total {\VBAR}    42196.82        49  861.159592   Root MSE        =     9.988
+{\smallskip}
+\HLI{14}{\TOPT}\HLI{64}
+        brate {\VBAR} Coefficient  Std. err.      t    P>|t|     [95\% conf. interval]
+\HLI{14}{\PLUS}\HLI{64}
+         z_mr {\VBAR}  -3.477128   2.338042    -1.49   0.144    -8.189142    1.234887
+         z_dr {\VBAR}   7.066246   2.399416     2.94   0.005      2.23054    11.90195
+        z_pop {\VBAR}    .124971   1.533754     0.08   0.935    -2.966108     3.21605
+         z_ma {\VBAR}  -23.84698   1.585808   -15.04   0.000    -27.04297   -20.65099
+              {\VBAR}
+c.z_ma\#c.z_ma {\VBAR}   4.315234   .7319742     5.90   0.000     2.840037    5.790431
+              {\VBAR}
+        _cons {\VBAR}   163.7111   1.584228   103.34   0.000     160.5183    166.9039
+\HLI{14}{\BOTT}\HLI{64}
+{\smallskip}
+. test z_dr = z_pop
+{\smallskip}
+ ( 1)  z_dr - z_pop = 0
+{\smallskip}
+       F(  1,    44) =    6.22
+            Prob > F =    0.0165
+{\smallskip}
+. viztest, inc0
+ 
+Optimal Levels: 
+ 
+Smallest Level: .65
+Middle Level: .77
+Largest Level: .91
+Easiest Level: .82
+ 
+No missed tests!
+{\smallskip}
+. coefplot, drop(_cons) sort(., by(b)) level(95 82) xline(0) ///
+>   xtitle("Coefficient Estimates" "95\% and 82\% Confidence Intervals")

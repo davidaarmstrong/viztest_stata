@@ -1,0 +1,6 @@
+. quietly  margins, dydx(*) 
+{\smallskip}
+. marginsplot, level(82) recast(scatter) horizontal derivlabels ytitle("") ///
+>   xtitle("Average Marginal Effect" "82\% Inferential Confidence Intervals") title("")
+{\smallskip}
+Variables that uniquely identify margins: {\bftt{_deriv}}
