@@ -394,6 +394,7 @@ program viztest, rclass
 	mata: nrr = rows(res_s)
 	mata: bg = res_s[nrr, ]
 	mata: mid_idx = floor(nrr/2)
+	di "nrr = `nrr'"
 	di "mid_idx = `mid_idx'"
 	mata: mid = res_s[mid_idx, ]
 	mata: mxe = max(res_s[,3])
