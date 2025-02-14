@@ -453,7 +453,7 @@ program viztest, rclass
   		frame change default
   	}
 	}
-	st_matrix("miss_tests", miss_tests)
+	mata: st_matrix("miss_tests", miss_tests)
 	return scalar easiest = `elev'
 	return scalar middle = `mlev'
 	return scalar biggest = `blev'
