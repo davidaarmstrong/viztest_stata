@@ -346,7 +346,7 @@ program viztest, rclass
 	forval l = 2/`nlevs'  {
 		local qtl = 1-(1-levs[`l',1])/2
 		mata: LL = LL, bhat[,1] - invt(`resdf', `qtl'):*sqrt(diagonal(V))[,1]
-		mata: UU = UU, bhat[,1] + invt(`resdf', `qtl'):*sqrt(diagonal(V))[,1]
+		mata: UU = UU, bhat[,1] + invt(`qtl'):*sqrt(diagonal(V))[,1]
 		}
 	mata: maxU = colmax(UU)
 	mata: minL = colmin(LL)
@@ -457,8 +457,8 @@ program viztest, rclass
 	return scalar middle = `mlev'
 	return scalar biggest = `blev'
 	return scalar smallest = `slev'
-	return matrix grid = res
-	return matrix missed = miss_tests
+//	return matrix grid = res
+//	return matrix missed = miss_tests
 end
 
 mata
