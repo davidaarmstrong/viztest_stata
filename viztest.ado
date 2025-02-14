@@ -339,7 +339,7 @@ program viztest, rclass
 	local qtl = 1-(1-`lev1')/2
 	di "qtl = `qtl'"
 	mata: LL = bhat[,1] - invt(`resdf', `qtl'):*sqrt(diagonal(V))[,1]
-	mata: UU = bhat[,1] + int(`resdf', `qtl'):*sqrt(diagonal(V))[,1]
+	mata: UU = bhat[,1] + invt(`resdf', `qtl'):*sqrt(diagonal(V))[,1]
 	mata: levs = range(`lev1', `lev2', `incr')
 	mata: st_matrix("levs", levs)
 	local nlevs = rowsof(levs)
