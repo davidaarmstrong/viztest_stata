@@ -422,6 +422,8 @@ program viztest, rclass
 	di " "
 	mata: cn_miss = ("LARGER" , "SMALLER" , "PW TEST" , "CI TEST" \ "------", "-------", "-------", "-------")
 	mata: (cn_miss \ miss_tests)
+	mata: st_matrix("miss_tests", miss_tests)
+	return matrix missed = miss_tests
 	}
 	else{
 		di "No missed tests!"
@@ -453,13 +455,11 @@ program viztest, rclass
   		frame change default
   	}
 	}
-	mata: st_matrix("miss_tests", miss_tests)
 	return scalar easiest = `elev'
 	return scalar middle = `mlev'
 	return scalar biggest = `blev'
 	return scalar smallest = `slev'
 	return matrix grid = res
-	return matrix missed = miss_tests
 
 end
 
