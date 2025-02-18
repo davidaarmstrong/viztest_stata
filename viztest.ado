@@ -290,7 +290,6 @@ program viztest, rclass
 	mata: ones = J(`np', 1, 1)
 	mata: st_numscalar("nsig", pwtests'*ones)
 	local qtl = 1-(1-`lev1')/2
-	di "qtl = `qtl'"
 	mata: LL = newBhat[,1] - invt(`resdf', `qtl'):*sqrt(diagonal(newV))[,1]
 	mata: UU = newBhat[,1] + invt(`resdf', `qtl'):*sqrt(diagonal(newV))[,1]
 	mata: levs = range(`lev1', `lev2', `incr')
