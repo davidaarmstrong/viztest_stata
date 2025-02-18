@@ -319,7 +319,7 @@ program viztest, rclass
 	mata: dinsig = replaceneg(dinsig)
 	mata: dsig = colmin(dsig)
 	mata: dinsig = colmin(dinsig)
-	mata: easy = dinsig:*dsig
+	mata: easy = -abs(dinsig:-dsig)
 	mata: res = levs, (comptests'*ones):/`np', easy'
 	mata: st_matrix("res", res)
 	mata: cm = colmax(res)
@@ -337,7 +337,6 @@ program viztest, rclass
 	mata: ones = J(`np', 1, 1)
 	mata: st_numscalar("nsig", pwtests'*ones)
 	local qtl = 1-(1-`lev1')/2
-	di "qtl = `qtl'"
 	mata: LL = bhat[,1] - invt(`resdf', `qtl'):*sqrt(diagonal(V))[,1]
 	mata: UU = bhat[,1] + invt(`resdf', `qtl'):*sqrt(diagonal(V))[,1]
 	mata: levs = range(`lev1', `lev2', `incr')
@@ -355,20 +354,24 @@ program viztest, rclass
 	mata: citests = L :>= U
 	mata: comptests = citests :== pwtests
 	
-	mat res_s = J(1,3,0)
-	local nlev = rowsof(res)
-	forval i = 1/`nlev' {
-		local psm = res[`i', 2]
-		if `psm' == cm {
-			mat res_s = res_s \ res[`i',....]
-		}
-	}
-	local nrs = rowsof(res_s)
-	mat res_s = res_s[2..`nrs', ....]
-	mata: res_s = st_matrix("res_s")
+	mata: res_s = levs, (comptests'*ones):/`np', easy'
+	
+//	mat res_s = J(1,3,0)
+//	local nlev = rowsof(res)
+//	forval i = 1/`nlev' {
+//		local psm = res[`i', 2]
+//		if `psm' == cm {
+//			mat res_s = res_s \ res[`i',....]
+//		}
+//	}
+
+	mata: cms = colmax(res_s)
+	mata: return_res = res_s
+	mata: st_matrix("res_s", return_res)
+	mata: res_s = select(res_s, res_s[,2] :== cms[1,2])
 	mata: cms = colmax(res_s)
 	mata: st_numscalar("maxeasy", cms[1,3])
-	local nrs = rowsof(res_s)
+	mata: st_numscalar("nrs", rows(res_s))
 	mata: cit = select(citests, levs' :== cms[1,1])
 	mata: alltests = pairs, pwtests, cit
 	mata: st_matrix("alltests", alltests)
@@ -396,9 +399,6 @@ program viztest, rclass
 	mata: nrr = rows(res_s)
 	mata: bg = res_s[nrr, ]
 	mata: mid_idx = floor(nrr/2)
-	mat list res_s
-	di "nrr = `nrr'"
-	di "mid_idx = `mid_idx'"
 	mata: mid = res_s[mid_idx, ]
 	mata: mxe = max(res_s[,3])
 	mata: esy = select(res_s, res_s[,3] :== mxe)
@@ -493,14 +493,17 @@ real matrix replaceneg(real matrix x) {
 	for (i = 1; i <= nrows; i++) {
 		for (j = 1; j <= ncols; j++) {
 			if (out[i,j] < 0) {
-				out[i,j] = .
+				out[i,j] = 0
+			}
+			if (out[i,j] == .) {
+				out[i,j] = 0
 			}
 		}
 	}
 	return(out)
 }
 
- real matrix p_adjust(real matrix p, string scalar m){
+real matrix p_adjust(real matrix p, string scalar m){
 	methods = ("bonferroni", "holm", "hochberg", "hommel", "bh", "by", "none")
 	inmeth = rowsum( m :== methods)
 	if(inmeth == 0) {
@@ -565,7 +568,7 @@ real matrix replaceneg(real matrix x) {
 		p_adj = p
 	}
 	return(p_adj)
- }
+}
 end
 
 
